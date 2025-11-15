@@ -1,0 +1,51 @@
+# Cloud Build configuration for VoiceBot
+# This is the DEFAULT configuration for backend
+# For frontend, use: gcloud builds submit --config=cloudbuild-frontend.yaml
+
+steps:
+  # Build backend Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    dir: 'backend'
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/voicebot-backend:latest'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/voicebot-backend:$SHORT_SHA'
+      - '.'
+
+  # Push backend image to Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'gcr.io/$PROJECT_ID/voicebot-backend:latest'
+
+  # Deploy to Cloud Run
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: bash
+    args:
+      - '-c'
+      - |
+        gcloud run deploy voicebot-backend \
+          --image=gcr.io/$PROJECT_ID/voicebot-backend:latest \
+          --region=us-central1 \
+          --platform=managed \
+          --allow-unauthenticated \
+          --port=8080 \
+          --memory=512Mi \
+          --cpu=1 \
+          --timeout=900 \
+          --set-env-vars=OPENAI_API_KEY=${_OPENAI_API_KEY},OPENAI_MODEL_STT=whisper-1,OPENAI_MODEL_TTS=gpt-4o-mini-tts,OPENAI_MODEL_CHAT=gpt-4o-mini
+
+images:
+  - 'gcr.io/$PROJECT_ID/voicebot-backend:latest'
+  - 'gcr.io/$PROJECT_ID/voicebot-backend:$SHORT_SHA'
+
+substitutions:
+  _OPENAI_API_KEY: '' # Set via --substitutions flag or Secret Manager
+
+options:
+  machineType: 'N1_HIGHCPU_8'
+  logging: CLOUD_LOGGING_ONLY
+  
+timeout: '1800s'
