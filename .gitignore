@@ -1,0 +1,20 @@
+# Root .gitignore
+.DS_Store
+.vscode/
+.idea/
+*.log
+.env
+*.tmp
+.venv
+venv/
+node_modules/
+__pycache__/
+*.pyc
+dist/
+build/
+*.egg-info/
+.pytest_cache/
+.coverage
+.mypy_cache/
+.env.local
+Thumbs.db

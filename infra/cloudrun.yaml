@@ -1,0 +1,27 @@
+# Example Cloud Run config for backend service
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: voicebot-backend
+spec:
+  template:
+    spec:
+      containers:
+        - image: gcr.io/PROJECT_ID/voicebot-backend
+          env:
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: OPENAI_API_KEY
+                  key: latest
+            - name: OPENAI_MODEL_STT
+              value: "whisper-1"
+            - name: OPENAI_MODEL_TTS
+              value: "gpt-4o-mini-tts"
+            - name: OPENAI_MODEL_CHAT
+              value: "gpt-4o-mini"
+            - name: FRONTEND_ORIGIN
+              value: "https://your-frontend-url"
+          ports:
+            - containerPort: 8080
+      timeoutSeconds: 300
