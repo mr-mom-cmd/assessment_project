@@ -2,16 +2,17 @@
 # Builds and deploys backend service to Cloud Run
 
 steps:
-  # Build backend Docker image
+  # Build backend Docker image from the root Dockerfile
   - name: 'gcr.io/cloud-builders/docker'
-    entrypoint: 'bash'
     args:
-      - '-c'
-      - |
-        cd backend
-        docker build -t gcr.io/$PROJECT_ID/voicebot-backend:latest \
-          -t gcr.io/$PROJECT_ID/voicebot-backend:$SHORT_SHA \
-          -f Dockerfile .
+      - 'build'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/voicebot-backend:latest'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/voicebot-backend:$SHORT_SHA'
+      - '-f'
+      - 'Dockerfile'  # Use the root Dockerfile
+      - '.'           # Build context is the root directory
 
   # Push backend image to Container Registry
   - name: 'gcr.io/cloud-builders/docker'
