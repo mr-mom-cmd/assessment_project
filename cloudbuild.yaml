@@ -1,18 +1,17 @@
-# Cloud Build configuration for VoiceBot
-# This is the DEFAULT configuration for backend
-# For frontend, use: gcloud builds submit --config=cloudbuild-frontend.yaml
+# Cloud Build configuration for VoiceBot Backend
+# Builds and deploys backend service to Cloud Run
 
 steps:
   # Build backend Docker image
   - name: 'gcr.io/cloud-builders/docker'
-    dir: 'backend'
+    entrypoint: 'bash'
     args:
-      - 'build'
-      - '-t'
-      - 'gcr.io/$PROJECT_ID/voicebot-backend:latest'
-      - '-t'
-      - 'gcr.io/$PROJECT_ID/voicebot-backend:$SHORT_SHA'
-      - '.'
+      - '-c'
+      - |
+        cd backend
+        docker build -t gcr.io/$PROJECT_ID/voicebot-backend:latest \
+          -t gcr.io/$PROJECT_ID/voicebot-backend:$SHORT_SHA \
+          -f Dockerfile .
 
   # Push backend image to Container Registry
   - name: 'gcr.io/cloud-builders/docker'
