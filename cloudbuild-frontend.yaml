@@ -1,0 +1,25 @@
+steps:
+  # Build the frontend Docker image with build args
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '--build-arg'
+      - 'VITE_API_BASE_URL=${_VITE_API_BASE_URL}'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/voicebot-frontend:latest'
+      - '-f'
+      - 'Dockerfile'
+      - '.'
+
+  # Push the frontend image
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'gcr.io/$PROJECT_ID/voicebot-frontend:latest'
+
+images:
+  - 'gcr.io/$PROJECT_ID/voicebot-frontend:latest'
+
+substitutions:
+  _VITE_API_BASE_URL: 'https://voicebot-backend-77584012253.us-central1.run.app'
+
